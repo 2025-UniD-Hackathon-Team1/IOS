@@ -38,7 +38,7 @@ struct ReportData: Codable, Equatable {
     }
 }
 
-struct UserInfo: Codable, Equatable {
+struct MyUserInfo: Codable, Equatable {
     /// 성별 (male, female, other)
     var gender: String
     
@@ -49,7 +49,7 @@ struct UserInfo: Codable, Equatable {
     var bedtime: String
     
     /// Equatable 프로토콜 준수를 위한 비교 함수
-    static func == (lhs: UserInfo, rhs: UserInfo) -> Bool {
+    static func == (lhs: MyUserInfo, rhs: MyUserInfo) -> Bool {
         return lhs.gender == rhs.gender &&
                lhs.age == rhs.age &&
                lhs.bedtime == rhs.bedtime
