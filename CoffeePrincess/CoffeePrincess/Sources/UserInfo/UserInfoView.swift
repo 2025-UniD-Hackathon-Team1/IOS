@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-private extension Color {
-    static let mainBrown        = Color(red: 106/255, green: 70/255,  blue: 22/255)   // #6A4616
-    static let secondaryBrown   = Color(red: 139/255, green: 111/255, blue: 71/255)
-    static let cardBackground   = Color(red: 252/255, green: 250/255, blue: 247/255)
-    static let beigeBackground  = Color(red: 248/255, green: 242/255, blue: 233/255)
-    static let dividerCol = Color(red: 229/255, green: 216/255, blue: 200/255)
-}
-
 struct UserInfoView: View {
     @ObservedObject var viewModel: UserInfoViewModel
     @Environment(\.dismiss) var dismiss
@@ -301,7 +293,7 @@ struct DropdownPicker: View {
                 .padding(.vertical, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.beigeBackground.opacity(0.5))
+                        .fill(Color.sectionBackground.opacity(0.5))
                 )
                 .onChange(of: selectedDate) { oldValue, newValue in
                     selection = viewModel.dateToTimeString(newValue)
@@ -371,7 +363,7 @@ struct RadioOption: View {
                 Spacer()
             }
             .padding(16)
-            .background(isSelected ? Color.beigeBackground : Color.white)
+            .background(isSelected ? Color.sectionBackground : Color.white)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
@@ -410,7 +402,7 @@ struct CheckboxOption: View {
                 Spacer()
             }
             .padding(16)
-            .background(isSelected ? Color.beigeBackground : Color.white)
+            .background(isSelected ? Color.sectionBackground : Color.white)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

@@ -13,4 +13,6 @@ struct UserInfo: Codable {
     var step: Int = 0               // 온보딩 단계
     var completed: Bool = false     // 온보딩 완료 여부
     var timestamp: TimeInterval = Date().timeIntervalSince1970
+    var gender: String = ""  // 성별 (male, female, other)
+    var age: Int = 0         // 나이
 }
