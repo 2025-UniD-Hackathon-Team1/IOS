@@ -77,8 +77,10 @@ struct SurveyView: View {
                     
                     // 완료 버튼
                     Button(action: {
-                        if viewModel.validateAndSave() {
-                            di.router.pop()
+                        viewModel.validateAndSend { success in
+                            if success {
+                                di.router.pop()
+                            }
                         }
                     }) {
                         Text("완료")

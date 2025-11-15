@@ -14,7 +14,7 @@ final class AuthManager {
     private let accessTokenKey = "accessToken"
     
     // 개발용 하드코딩 토큰 (Fallback용)
-    private let devToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzYzMjM1NjMwLCJleHAiOjE3NjMyNTM2MzB9.l34StwMovhieK0u2r4hoccfPCi1v-Y21nNwL1fYSG4Qgu-6YlRtX-01TQAulIIRHsl7f_M6cF2GH6ZGfEBVgKQ"
+    private let devToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzYzMjQzNzM2LCJleHAiOjE3NjMyNjE3MzZ9.pwX9Ip5ivq2CVmSxJ9Mp-2yYm6NnO6t_mXcN0qett1NHsIDveV_Rx9GRnz9_BaCPgwBVMlwEIgVORU-U0Jet5w"
 
     private init() {}
 
