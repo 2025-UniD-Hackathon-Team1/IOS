@@ -9,10 +9,9 @@ import Foundation
 import SwiftUI
 
 enum Route: Hashable {
-//    case onboarding
-    case home       // 메인 대시보드 (탭뷰가 있는)
     case addRecord
     case recordDetail(menuItem: MenuItem)
+    case scheduleInput 
 }
 
 final class AppRouter: ObservableObject {
