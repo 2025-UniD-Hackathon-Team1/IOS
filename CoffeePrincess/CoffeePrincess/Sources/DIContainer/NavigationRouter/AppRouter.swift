@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 enum Route: Hashable {
+    case home
     case addRecord
     case recordDetail(menuItem: MenuItem)
     case scheduleInput 

@@ -1,12 +1,12 @@
 import SwiftUI
 
-private extension Color {
-    static let mainBrown      = Color(red: 106/255, green:  70/255, blue:  22/255) // #6A4616
-    static let secondaryBrown = Color(red: 139/255, green: 111/255, blue:  71/255) // 살짝 밝은 브라운
-    static let cardBackground = Color(red: 248/255, green: 242/255, blue: 233/255) // 연한 베이지
-    static let sectionBackground = Color(red: 252/255, green: 250/255, blue: 247/255)
-    static let dividerColor   = Color(red: 229/255, green: 216/255, blue: 200/255)
-}
+//private extension Color {
+//    static let mainBrown      = Color(red: 106/255, green:  70/255, blue:  22/255) // #6A4616
+//    static let secondaryBrown = Color(red: 139/255, green: 111/255, blue:  71/255) // 살짝 밝은 브라운
+//    static let cardBackground = Color(red: 248/255, green: 242/255, blue: 233/255) // 연한 베이지
+//    static let sectionBackground = Color(red: 252/255, green: 250/255, blue: 247/255)
+//    static let dividerColor   = Color(red: 229/255, green: 216/255, blue: 200/255)
+//}
 
 import SwiftUI
 
@@ -151,7 +151,7 @@ struct ProfileHeaderView: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(Color.dividerColor, lineWidth: 2)
+                        .stroke(Color.dividerCol, lineWidth: 2)
                 )
 
             HStack(spacing: 4) {
@@ -173,7 +173,7 @@ struct ProfileHeaderView: View {
         .cornerRadius(20)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.dividerColor, lineWidth: 1)
+                .stroke(Color.dividerCol, lineWidth: 1)
         )
     }
 }
@@ -205,7 +205,7 @@ struct ProfileSection<Content: View>: View {
         .cornerRadius(20)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.dividerColor, lineWidth: 1)
+                .stroke(Color.dividerCol, lineWidth: 1)
         )
     }
 }
@@ -236,7 +236,7 @@ struct SettingRow: View {
             .padding(.vertical, 14)
             .overlay(alignment: .bottom) {
                 Rectangle()
-                    .fill(Color.dividerColor)
+                    .fill(Color.dividerCol)
                     .frame(height: 1)
             }
         }
@@ -272,7 +272,7 @@ struct InfoRow: View {
         .padding(.vertical, 14)
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(Color.dividerColor)
+                .fill(Color.dividerCol)
                 .frame(height: 1)
         }
     }
@@ -363,7 +363,7 @@ struct SleepTimeModalView: View {
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.dividerColor, lineWidth: 1)
+                    .stroke(Color.dividerCol, lineWidth: 1)
             )
         }
     }
@@ -411,7 +411,7 @@ struct TargetSleepModalView: View {
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.dividerColor, lineWidth: 1)
+                            .stroke(Color.dividerCol, lineWidth: 1)
                     )
                 }
 
@@ -476,7 +476,7 @@ struct MaxCaffeineModalView: View {
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.dividerColor, lineWidth: 1)
+                                .stroke(Color.dividerCol, lineWidth: 1)
                         )
                 }
 
