@@ -2,8 +2,6 @@
 //  SurveyViewModel.swift
 //  CoffeePrincess
 //
-//  Created by chohaeun on 11/16/25.
-//
 
 import Foundation
 import SwiftUI
@@ -17,6 +15,9 @@ class SurveyViewModel: ObservableObject {
     // MARK: - Alert
     @Published var showAlert: Bool = false
     @Published var alertMessage: String = ""
+    
+    // MARK: - Service
+    private let surveyService: SurveyService
     
     // MARK: - Formatter
     private let timeFormatter: DateFormatter = {
@@ -41,8 +42,9 @@ class SurveyViewModel: ObservableObject {
     }()
     
     // MARK: - Init
-    init() {
-        // 기본 수면 시간: 현재 시각 기준
+    init(surveyService: SurveyService = SurveyService()) {
+        self.surveyService = surveyService
+        
         let now = Date()
         self.sleepTime = timeFormatter.string(from: now)
         self.heartRate = 0   // 아직 선택 안 함
@@ -65,12 +67,11 @@ class SurveyViewModel: ObservableObject {
         return displayTimeFormatter.string(from: date)
     }
     
-    /// (옵션용) 시간 리스트가 필요하다면 사용 – 현재 뷰에서는 DatePicker만 쓰고 options는 크게 의미 없음
     func getTimeOptions() -> [String] {
         var result: [String] = []
         let calendar = Calendar.current
         if let start = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) {
-            for i in 0..<(24 * 2) { // 30분 단위
+            for i in 0..<(24 * 2) {
                 if let time = calendar.date(byAdding: .minute, value: i * 30, to: start) {
                     result.append(timeFormatter.string(from: time))
                 }
@@ -79,20 +80,23 @@ class SurveyViewModel: ObservableObject {
         return result
     }
     
-    // MARK: - Validate & Save
-    func validateAndSave() -> Bool {
+    // MARK: - Validate & Send
+    /// 유효성 검사 + 서버 전송까지 포함
+    func validateAndSend(completion: @escaping (Bool) -> Void) {
         // 심박 선택 여부
         guard heartRate != 0 else {
             alertMessage = "심장이 얼마나 뛰었는지 선택해주세요."
             showAlert = true
-            return false
+            completion(false)
+            return
         }
         
         // 수면 시간 선택 여부
         guard !sleepTime.isEmpty else {
             alertMessage = "어젯밤에 몇 시에 잠드셨는지 선택해주세요."
             showAlert = true
-            return false
+            completion(false)
+            return
         }
         
         // sleepDate는 "어젯밤" 기준으로 어제 날짜 자동 세팅
@@ -107,14 +111,26 @@ class SurveyViewModel: ObservableObject {
             heartRate: heartRate
         )
         
-        saveSurvey(survey)
-        return true
-    }
-    
-    // MARK: - Save (실제 저장 로직은 여기서 분리해서 구현 가능)
-    private func saveSurvey(_ survey: SurveyModel) {
-        // TODO: SurveyService 연동 등 실제 저장 로직
-        // 예: SurveyService.shared.save(survey)
-        print("Saved Survey:", survey)
+        // 서버 전송
+        surveyService.sendSurvey(survey) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else {
+                    completion(false)
+                    return
+                }
+                
+                switch result {
+                case .success:
+                    print("✅ 설문 서버 전송 성공:", survey)
+                    completion(true)
+                    
+                case .failure(let error):
+                    print("❌ 설문 서버 전송 실패:", error)
+                    self.alertMessage = "설문 서버 전송 실패: \(error.localizedDescription)"
+                    self.showAlert = true
+                    completion(false)
+                }
+            }
+        }
     }
 }
