@@ -29,11 +29,21 @@ struct SleepView: View {
                     Button {
                         di.router.push(.survey)
                     } label: {
-                        Image(.kongstand)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height:140)
-                            .offset(x:-100)
+                        ZStack{
+                            Image(.kongstand)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height:140)
+                                .offset(x:-100)
+                            
+                            Text("수면 패턴을 입력하세요")
+                                .foregroundColor(.black)
+                                .padding(10)
+                                .background(Color.dividerCol)
+                                .cornerRadius(10)
+                                .offset(y:-65)
+                            
+                        }
                     }
                 Spacer()
             }
@@ -82,6 +92,7 @@ extension SleepView{
                                 .font(.subheadline)
                                 .fontWeight(.bold)
                             ProgressView(value: Double(viewModel.sleepDisruptionPercent), total: 100)
+                                .foregroundColor(.secondaryBrown)
                                 .frame(width: 60)
                         }
                     }
