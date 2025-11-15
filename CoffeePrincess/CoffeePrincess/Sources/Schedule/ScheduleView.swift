@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScheduleView: View {
     @Environment(\.diContainer) private var di
+    @EnvironmentObject var scheduleService: ScheduleService  // ✅ 추가
     @StateObject private var viewModel = ScheduleViewModel()
     
     var body: some View {
@@ -105,7 +106,7 @@ struct ScheduleView: View {
                 VStack {
                     Button(action: {
                         let schedule = viewModel.buildSchedule()
-                        di.scheduleService.add(schedule)
+                        scheduleService.add(schedule)
                         di.router.pop()
                     }) {
                         Text("일정 저장")
