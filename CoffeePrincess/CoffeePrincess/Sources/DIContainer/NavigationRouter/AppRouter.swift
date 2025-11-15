@@ -15,6 +15,7 @@ enum Route: Hashable {
     case scheduleInput
     case newReport
     case newReportProfile
+    case survey
 }
 
 final class AppRouter: ObservableObject {

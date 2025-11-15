@@ -27,7 +27,7 @@ struct SleepView: View {
                 Spacer(minLength: 60)
 
                     Button {
-                        di.router.push(.scheduleInput)
+                        di.router.push(.survey)
                     } label: {
                         Image(.kongstand)
                             .resizable()

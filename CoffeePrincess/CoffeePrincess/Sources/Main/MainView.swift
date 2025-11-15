@@ -10,7 +10,6 @@ import SwiftUI
 struct MainView: View {
     
     @StateObject private var viewModel: MainViewModel
-    @State private var selectedPeriod: CaffeinePeriod = .week
     @Environment(\.diContainer) private var di
     
     init(viewModel: MainViewModel = MainViewModel()) {

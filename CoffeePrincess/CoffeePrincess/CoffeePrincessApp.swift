@@ -48,6 +48,9 @@ struct CoffeePrincessApp: App {
                         case .newReportProfile:
                             NewReportProfileView()
                                 .navigationBarBackButtonHidden(true)
+                        case .survey:
+                            SurveyView(viewModel: SurveyViewModel())
+                                .navigationBarBackButtonHidden(true)
                         }
                     }
             }

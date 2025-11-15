@@ -15,11 +15,6 @@ struct Drink: Identifiable {
     let timeText: String
 }
 
-enum CaffeinePeriod: String, CaseIterable {
-    case week = "주간"
-    case month = "월간"
-}
-
 struct MetabolismBar: Identifiable {
     let id = UUID()
     let timeLabel: String
