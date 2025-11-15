@@ -12,7 +12,6 @@ struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     @State private var selectedPeriod: CaffeinePeriod = .week
     @Environment(\.diContainer) private var di
-    @EnvironmentObject private var scheduleService: ScheduleService
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
