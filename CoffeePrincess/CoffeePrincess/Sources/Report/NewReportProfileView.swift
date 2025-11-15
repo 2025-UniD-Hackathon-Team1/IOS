@@ -10,84 +10,100 @@ import SwiftUI
 struct NewReportProfileView: View {
     @Environment(\.diContainer) private var di
     
+    // ViewModel은 View 내에서 생성됩니다.
+    // ViewModel의 init()에서 UserService가 생성됩니다.
     @StateObject var viewModel = NewReportProfileViewModel()
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HeaderBar(viewText: "프로필 설정", onTapBack: { di.router.pop() })
-            Spacer()
-            // 성별
-            VStack(alignment: .leading, spacing: 12) {
-                Text("성별")
-                    .font(.pretendard(.semiBold, size: 16)) // Custom Font
-                    .foregroundColor(.mainBrown) // Custom Color
+        // ZStack을 추가하여 로딩 뷰를 오버레이
+        ZStack {
+            VStack(alignment: .leading, spacing: 20) {
+                HeaderBar(viewText: "프로필 설정", onTapBack: { di.router.pop() })
                 
-                HStack(spacing: 12) {
-                    GenderOption(
-                        title: "남성",
-                        value: "male",
-                        isSelected: viewModel.gender == "male",
-                        action: { viewModel.gender = "male" }
-                    )
-                    
-                    GenderOption(
-                        title: "여성",
-                        value: "female",
-                        isSelected: viewModel.gender == "female",
-                        action: { viewModel.gender = "female" }
-                    )
-                    
-                    GenderOption(
-                        title: "기타",
-                        value: "other",
-                        isSelected: viewModel.gender == "other",
-                        action: { viewModel.gender = "other" }
-                    )
+                // 불필요한 Spacer 제거, ScrollView로 대체
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        
+                        // 성별
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("성별")
+                                .font(.pretendard(.semiBold, size: 16))
+                                .foregroundColor(.mainBrown)
+                            
+                            HStack(spacing: 12) {
+                                GenderOption(
+                                    title: "남성",
+                                    value: "male",
+                                    isSelected: viewModel.gender == "male",
+                                    action: { viewModel.gender = "male" }
+                                )
+                                GenderOption(
+                                    title: "여성",
+                                    value: "female",
+                                    isSelected: viewModel.gender == "female",
+                                    action: { viewModel.gender = "female" }
+                                )
+                                GenderOption(
+                                    title: "기타",
+                                    value: "other",
+                                    isSelected: viewModel.gender == "other",
+                                    action: { viewModel.gender = "other" }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // 나이
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("나이")
+                                .font(.pretendard(.semiBold, size: 16))
+                                .foregroundColor(.mainBrown)
+                            
+                            TextField("나이를 입력하세요", text: $viewModel.age)
+                                .font(.pretendard(.medium, size: 16))
+                                .keyboardType(.numberPad)
+                                .padding(14)
+                                .background(Color.cardBackground)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.dividerCol, lineWidth: 1)
+                                )
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // 희망 취침 시간
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("희망 취침 시간")
+                                .font(.pretendard(.semiBold, size: 16))
+                                .foregroundColor(.mainBrown)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                ReportDropdownPicker(
+                                    selection: $viewModel.bedtime,
+                                    options: viewModel.getTimeOptions(),
+                                    display: { viewModel.formatTimeDisplay($0) },
+                                    viewModel: viewModel
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                    }
+                    .padding(.top, 20) // ScrollView 컨텐츠 상단 패딩
                 }
-            }
-            .padding(.horizontal, 20)
-            
-            // 나이
-            VStack(alignment: .leading, spacing: 12) {
-                Text("나이")
-                    .font(.pretendard(.semiBold, size: 16))
-                    .foregroundColor(.mainBrown)
                 
-                TextField("나이를 입력하세요", text: $viewModel.age)
-                    .font(.pretendard(.medium, size: 16))
-                    .keyboardType(.numberPad)
-                    .padding(14)
-                    .background(Color.cardBackground) // Custom Color
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.dividerCol, lineWidth: 1) // Custom Color
-                    )
-            }
-            .padding(.horizontal, 20)
-            // 희망 취침 시간
-            VStack(alignment: .leading, spacing: 12) {
-                Text("희망 취침 시간")
-                    .font(.pretendard(.semiBold, size: 16))
-                    .foregroundColor(.mainBrown)
+                Spacer() // 버튼을 하단에 고정
                 
-                VStack(alignment: .leading, spacing: 12) {
-                    ReportDropdownPicker(
-                        selection: $viewModel.bedtime,
-                        options: viewModel.getTimeOptions(),
-                        display: { viewModel.formatTimeDisplay($0) },
-                        viewModel: viewModel
-                    )
-                }
+                // 완료 버튼 (ScrollView 밖에 위치)
                 Button(action: {
-//                    if viewModel.validateData() {
-                        // 데이터 저장 로직
-                        print("데이터 저장 성공:")
-                        print("- 성별: \(viewModel.gender)")
-                        print("- 나이: \(viewModel.age)")
-                        print("- 취침시간: \(viewModel.bedtime)")
-                        di.router.pop()
-//                    }
+                    // ★★★ 수정된 버튼 액션 ★★★
+                    viewModel.saveData { success in
+                        if success {
+                            // 저장이 성공했을 때만 pop 실행
+                            print("데이터 저장 성공, 뷰를 닫습니다.")
+                            di.router.pop()
+                        }
+                    }
                 }) {
                     Text("완료")
                         .font(.pretendard(.semiBold, size: 18))
@@ -97,11 +113,28 @@ struct NewReportProfileView: View {
                         .background(Color.secondaryBrown)
                         .cornerRadius(16)
                 }
-                .padding(.vertical, 30)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 30)
-            Spacer()
+//            .background(Color.screenBackground.ignoresSafeArea()) // 배경색
+            
+            // ★★★ 로딩 오버레이 ★★★
+            if viewModel.isLoading {
+                Color.black.opacity(0.3).ignoresSafeArea()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+            }
+        }
+        .onAppear {
+            // ★★★ 뷰가 나타날 때 데이터 로드 ★★★
+            viewModel.loadData()
+        }
+        .alert("알림", isPresented: $viewModel.showAlert) {
+            // ★★★ 알림 모디파이어 ★★★
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text(viewModel.alertMessage)
         }
     }
 }

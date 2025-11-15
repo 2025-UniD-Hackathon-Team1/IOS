@@ -45,7 +45,7 @@ struct HeaderSection: View {
                 HStack(spacing: 10) {
                     
                     Button {
-                        // 프로필 화면으로 이동 액션 연결 예정
+                        di.router.push(.newReport)
                     } label: {
                         Image(.fileicon)
                             .resizable()
