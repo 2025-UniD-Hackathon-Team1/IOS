@@ -26,87 +26,100 @@ struct RecordDetailView: View {
     }
     
     var body: some View {
-        HeaderBar(viewText: viewModel.selectedMenuItem.name, onTapBack: { di.router.pop() })
-        VStack(spacing: 0) {
-            List {
-                // MARK: - 메뉴 설정
-                Section(header: headerView(title: "섭취량 설정")) {
-                    Stepper(value: $viewModel.shotCount, in: 0...10) {
-                        HStack {
-//                            Image(systemName: "plus.circle")
-                            Image(.plus)
-                                .foregroundStyle(Color.mainBrown)
-                                .padding(.trailing, 5)
-                            Text("샷 추가")
-//                                .font(.pretendard(.regular, size: 17))
-                            Spacer()
-                            Text("\(viewModel.shotCount) 샷")
-                                .foregroundStyle(Color.mainBrown)
-                        }
-                    }
-                    .font(.pretendard(.regular, size: 17))
-                    HStack {
-                        Image(.size)
-                            .foregroundStyle(Color.mainBrown)
-                            .padding(.trailing, 5)
-                        Picker("사이즈", selection: $viewModel.size) {
-                            ForEach(CoffeeSize.allCases, id: \.self) { size in
-                                Text(size.rawValue).tag(size)
+        ZStack {
+            VStack(spacing: 0) {
+                HeaderBar(viewText: viewModel.selectedMenuItem.name, onTapBack: { di.router.pop() })
+                List {
+                    // MARK: - 메뉴 설정
+                    Section(header: headerView(title: "섭취량 설정")) {
+                        Stepper(value: $viewModel.shotCount, in: 0...10) {
+                            HStack {
+    //                            Image(systemName: "plus.circle")
+                                Image(.plus)
+                                    .foregroundStyle(Color.mainBrown)
+                                    .padding(.trailing, 5)
+                                Text("샷 추가")
+    //                                .font(.pretendard(.regular, size: 17))
+                                Spacer()
+                                Text("\(viewModel.shotCount) 샷")
+                                    .foregroundStyle(Color.mainBrown)
                             }
                         }
+                        .font(.pretendard(.regular, size: 17))
+                        HStack {
+                            Image(.size)
+                                .foregroundStyle(Color.mainBrown)
+                                .padding(.trailing, 5)
+                            Picker("사이즈", selection: $viewModel.size) {
+                                ForEach(CoffeeSize.allCases, id: \.self) { size in
+                                    Text(size.rawValue).tag(size)
+                                }
+                            }
+                        }
+                        .font(.pretendard(.regular, size: 17))
+                        .pickerStyle(.menu)
+                        .tint(Color.mainBrown)
                     }
-                    .font(.pretendard(.regular, size: 17))
-                    .pickerStyle(.menu)
-                    .tint(Color.mainBrown)
-                }
-                .listRowBackground(Color.cardBackground)
-                
-                // MARK: - 시간 설정
-                Section(header: headerView(title: "섭취 시간")) {
-                    DatePicker(
-                        "마신 시간",
-                        selection: $viewModel.selectedDate,
-                        in: ...Date(), // 미래 시간은 선택 불가
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    .datePickerStyle(.graphical) // 달력 스타일
-                    .labelsHidden()
-                    .tint(Color.secondaryBrown)
-                }
-                .listRowBackground(Color.cardBackground)
-                
-                // MARK: - 총 카페인 (계산 결과)
-                Section(/*header: headerView(title: "예상 카페인")*/) {
-                    HStack {
-                        Image("activity-heart")
-                            .foregroundStyle(Color.mainBrown)
-                        Text("예상 총 카페인 함량")
-                            .font(.pretendard(.regular, size: 17))
-                        Spacer()
-                        Text("\(viewModel.totalCaffeine) mg")
-                            .font(.pretendard(.bold, size: 19))
-                            .foregroundColor(.secondaryBrown)
+                    .listRowBackground(Color.cardBackground)
+                    
+                    // MARK: - 시간 설정
+                    Section(header: headerView(title: "섭취 시간")) {
+                        DatePicker(
+                            "마신 시간",
+                            selection: $viewModel.selectedDate,
+                            in: ...Date(), // 미래 시간은 선택 불가
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .datePickerStyle(.graphical) // 달력 스타일
+                        .labelsHidden()
+                        .tint(Color.secondaryBrown)
                     }
+                    .listRowBackground(Color.cardBackground)
+                    
+                    // MARK: - 총 카페인 (계산 결과)
+                    Section(/*header: headerView(title: "예상 카페인")*/) {
+                        HStack {
+                            Image("activity-heart")
+                                .foregroundStyle(Color.mainBrown)
+                            Text("예상 총 카페인 함량")
+                                .font(.pretendard(.regular, size: 17))
+                            Spacer()
+                            Text("\(viewModel.totalCaffeine) mg")
+                                .font(.pretendard(.bold, size: 19))
+                                .foregroundColor(.secondaryBrown)
+                        }
+                    }
+                    .listRowBackground(Color.cardBackground)
                 }
-                .listRowBackground(Color.cardBackground)
+                .scrollContentBackground(.hidden)
+    //            .listStyle(.insetGrouped)
+                
+                // MARK: - 저장 버튼
+                Button(action: {
+                    viewModel.saveRecord(container: di)
+                }) {
+                    Text("저장하기")
+                        .font(.pretendard(.bold, size: 18))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.secondaryBrown)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal, 20)
+    //            .padding(.bottom, 10)
             }
-            .scrollContentBackground(.hidden)
-//            .listStyle(.insetGrouped)
-            
-            // MARK: - 저장 버튼
-            Button(action: {
-                viewModel.saveRecord(container: di)
-            }) {
-                Text("저장하기")
-                    .font(.pretendard(.bold, size: 18))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.secondaryBrown)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+            if viewModel.isLoading {
+                Color.black.opacity(0.3).ignoresSafeArea()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
             }
-            .padding(.horizontal, 20)
-//            .padding(.bottom, 10)
+        }
+        .alert("알림", isPresented: $viewModel.showAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text(viewModel.alertMessage)
         }
 //        .navigationTitle(viewModel.selectedMenuItem.name) // 네비게이션 타이틀에 메뉴 이름
 //        .navigationBarTitleDisplayMode(.inline)

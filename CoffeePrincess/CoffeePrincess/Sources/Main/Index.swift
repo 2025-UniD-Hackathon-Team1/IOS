@@ -105,7 +105,7 @@ struct Index: View {
     // 플로팅 + 버튼
     private var addCaffeineButton: some View {
         Button {
-            // "카페인 추가" 서브 화면/모달로 이동 액션 연결 예정
+            di.router.push(.addRecord)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")

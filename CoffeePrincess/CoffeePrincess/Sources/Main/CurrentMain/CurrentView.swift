@@ -30,6 +30,10 @@ struct CurrentView: View {
                 
             }
             .background(Color(.cardBackground))
+            .task {
+                // ★★★ 뷰가 나타날 때 API 호출 ★★★
+                viewModel.fetchTodayCoffee(container: di)
+            }
     }
 }
 
@@ -178,7 +182,16 @@ extension CurrentView {
                 .font(.headline)
                 .foregroundColor(.fontBrown)
             
-            if viewModel.todayDrinks.isEmpty {
+            // ★★★ (수정) 로딩 및 빈 상태 처리 ★★★
+            if viewModel.isLoadingTodayDrinks {
+                HStack {
+                    Spacer()
+                    ProgressView() // 로딩 중 스피너 표시
+                    Spacer()
+                }
+                .frame(height: 60)
+                
+            } else if viewModel.todayDrinks.isEmpty {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(.systemGray6))
                     .frame(height: 60)
@@ -229,7 +242,7 @@ extension CurrentView {
     // 플로팅 + 버튼
     private var addCaffeineButton: some View {
         Button {
-            // "카페인 추가" 서브 화면/모달로 이동 액션 연결 예정
+            di.router.push(.addRecord)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")

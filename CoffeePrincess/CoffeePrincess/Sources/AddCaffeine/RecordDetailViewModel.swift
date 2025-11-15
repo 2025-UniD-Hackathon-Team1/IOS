@@ -11,32 +11,47 @@ import SwiftUI
 
 /// RecordDetailView의 상태와 로직을 관리하는 ViewModel (새 로직 적용)
 class RecordDetailViewModel: ObservableObject {
-    
     // MARK: - Properties
-    
     let selectedMenuItem: MenuItem
     
     // MARK: - Published State
     
-    @Published var shotCount: Int = 0 // "추가 샷"을 의미하며 0에서 시작
+    @Published var shotCount: Int = 0
     @Published var size: CoffeeSize = .tall
     @Published var selectedDate: Date = Date()
-    @Published var totalCaffeine: Int = 0 // 계산된 총 카페인
+    @Published var totalCaffeine: Int = 0
+    
+    // --- ★★★ API 연동을 위해 추가된 상태 ★★★ ---
+    @Published var isLoading: Bool = false
+    @Published var showAlert: Bool = false
+    @Published var alertMessage: String = ""
     
     // MARK: - Private Properties
     
     private var cancellables = Set<AnyCancellable>()
     
+    // --- ★★★ 날짜 포맷을 위한 헬퍼 추가 ★★★ ---
+    private var dateFomatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+    
+    private var timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+
     // MARK: - Initializer
     
+    // (A님이 원하시는 init(menuItem:) 구조)
     init(menuItem: MenuItem) {
         self.selectedMenuItem = menuItem
-        
-        // 1. 초기값 설정 (Tall, 추가 샷 0)
         self.size = .tall
         self.shotCount = 0
-        
-        // 2. 바인딩 설정
         setupBindings()
     }
     
@@ -69,17 +84,43 @@ class RecordDetailViewModel: ObservableObject {
     
     // MARK: - Public Methods
     
-    /// 저장 버튼 로직 (DIContainer를 통해 주입받아 사용)
+    /// (POST) ★★★ 서버에 커피 기록을 저장하는 수정된 함수 ★★★
     func saveRecord(container: DIContainer) {
-        print("--- 카페인 기록 저장 ---")
-        print("메뉴: \(selectedMenuItem.name)")
-        print("추가 샷: \(shotCount), 사이즈: \(size.rawValue)")
-        print("시간: \(selectedDate)")
-        print("총 카페인: \(totalCaffeine)mg")
         
-        // TODO: container.caffeineService.addRecord(...) 같은 저장 로직 호출
+        // 1. 서버에 보낼 CoffeeRecord 모델 생성
+        let record = CoffeeRecord(
+            drinkDate: dateFomatter.string(from: selectedDate),
+            drinkTime: timeFormatter.string(from: selectedDate),
+            coffeeName: selectedMenuItem.name,
+            caffeineAmount: totalCaffeine
+        )
         
-        // 저장 후 이전 화면으로 돌아가기
-        container.router.pop()
+        print("--- 🚀 [POST] 커피 기록 저장 요청 ---")
+        print(record)
+        
+        isLoading = true
+        
+        // 2. (수정) DIContainer에서 'coffeeService'를 가져와 API 호출
+        //    (DIContainer에 coffeeService가 등록되어 있어야 함)
+        container.coffeeService.addCoffeeRecord(record) { [weak self] result in
+            
+            // 3. 메인 스레드에서 UI 업데이트
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                
+                switch result {
+                case .success:
+                    print("✅ [POST] 커피 기록 저장 성공")
+                    // 4. 성공 시 이전 화면으로 돌아가기
+                    container.router.pop()
+                    
+                case .failure(let error):
+                    print("❌ [POST] 커피 기록 저장 실패: \(error.localizedDescription)")
+                    // 5. 실패 시 알림
+                    self?.alertMessage = "저장에 실패했습니다: \(error.localizedDescription)"
+                    self?.showAlert = true
+                }
+            }
+        }
     }
 }
