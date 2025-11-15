@@ -11,7 +11,7 @@ final class CurrentViewModel: ObservableObject {
     
     // MARK: - 대시보드 기본 상태
     @Published var currentCaffeine: Double = 0
-    @Published var caffeinePercent: Double = 0
+    @Published var currentAlertnessPercent: Double = 0 // 각성도
     @Published var energyPercent: Double = 0
     @Published var statusIcon: String = ""
     @Published var statusText: String = ""
@@ -91,7 +91,7 @@ final class CurrentViewModel: ObservableObject {
     // MARK: - Mock Data
     private func loadMockData() {
         currentCaffeine      = 185.0
-        caffeinePercent      = 46.0
+        currentAlertnessPercent      = 46.0
         energyPercent        = 78.0
         statusIcon           = "😌"
         statusText           = "보통"

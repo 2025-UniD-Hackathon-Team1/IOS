@@ -89,11 +89,11 @@ extension CurrentView {
                 // 가로 카페인 게이지
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text("카페인 지수")
+                        Text("각성도")
                             .font(.caption)
                             .foregroundColor(.secondaryBrown)
                         Spacer()
-                        Text("\(Int(viewModel.caffeinePercent))%")
+                        Text("\(Int(viewModel.currentAlertnessPercent))%")
                             .font(.caption)
                             .foregroundColor(.secondaryBrown)
                     }
@@ -103,7 +103,7 @@ extension CurrentView {
                             .fill(Color(.sectionBackground))
                         
                         GeometryReader { proxy in
-                            let width = proxy.size.width * CGFloat(viewModel.caffeinePercent / 100.0)
+                            let width = proxy.size.width * CGFloat(viewModel.currentAlertnessPercent / 100.0)
                             
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(
@@ -145,7 +145,7 @@ extension CurrentView {
             }
             
             HStack(spacing: 12) {
-                statBox(title: "카페인 농도", value: "\(Int(viewModel.caffeinePercent))%")
+//                statBox(title: "카페인 농도", value: "\(Int(viewModel.caffeinePercent))%")
                 statBox(title: "에너지 레벨", value: "\(Int(viewModel.energyPercent))%")
                 statBox(title: "각성 종료", value: viewModel.awakeEndText)
             }
