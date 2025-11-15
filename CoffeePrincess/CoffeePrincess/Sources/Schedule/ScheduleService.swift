@@ -17,8 +17,13 @@ final class ScheduleService: ObservableObject {
         todaySchedules.append(schedule)
     }
     
+    /// 동일한 name + date + time 을 가진 일정 삭제
     func remove(_ schedule: Schedule) {
-        todaySchedules.removeAll { $0.id == schedule.id }
+        todaySchedules.removeAll {
+            $0.name == schedule.name &&
+            $0.date == schedule.date &&
+            $0.time == schedule.time
+        }
     }
     
     func reset() {

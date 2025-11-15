@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SleepView: View {
     
-    @StateObject private var viewModel: MainViewModel
+    @StateObject private var viewModel: SleepViewModel
     @Environment(\.diContainer) private var di
     
-    init(viewModel: MainViewModel = MainViewModel()) {
+    init(viewModel: SleepViewModel = SleepViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     

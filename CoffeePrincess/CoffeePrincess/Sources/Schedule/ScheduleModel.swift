@@ -9,6 +9,8 @@ import Foundation
 
 struct Schedule: Identifiable {
     let id = UUID()
-    var title: String
+    
+    var name: String
+    var date: String   // "2025-11-15"
     var time: String   // "HH:mm"
 }

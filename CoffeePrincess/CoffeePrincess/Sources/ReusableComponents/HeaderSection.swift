@@ -12,10 +12,10 @@ import Foundation
 // 상단 헤더 (오늘 날짜, 검색, 프로필)
 struct HeaderSection: View {
     
-    @StateObject private var viewModel: MainViewModel
+    @StateObject private var viewModel:  CurrentViewModel
     @Environment(\.diContainer) private var di
     
-    init(viewModel: MainViewModel = MainViewModel()) {
+    init(viewModel: CurrentViewModel = CurrentViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     

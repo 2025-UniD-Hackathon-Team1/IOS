@@ -8,7 +8,6 @@ import SwiftUI
 
 struct Index: View {
     
-    @StateObject private var viewModel: MainViewModel
     @Environment(\.diContainer) private var di
     
     private enum Tab {
@@ -19,10 +18,6 @@ struct Index: View {
     
     @State private var selectedTab: Tab = .current
     
-    init(viewModel: MainViewModel = MainViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
-    
     var body: some View {
         ZStack {
             Color(.cardBackground)
@@ -31,7 +26,6 @@ struct Index: View {
             VStack(spacing: 0) {
                 HeaderSection()
                     .padding(25)
-
                 
                 tabBar
 
@@ -43,7 +37,7 @@ struct Index: View {
                 }
             }
             
-            if(selectedTab == .current){
+            if selectedTab == .current {
                 Image(.kong)
                     .resizable()
                     .scaledToFit()
@@ -54,11 +48,13 @@ struct Index: View {
             HStack {
                 Spacer()
                 addCaffeineButton
-            }.padding(.trailing, 24)
-                .padding(.bottom, 24)
-                .offset(y: 350)
+            }
+            .padding(.trailing, 24)
+            .padding(.bottom, 24)
+            .offset(y: 350)
         }
     }
+    
     private var tabBar: some View {
         HStack(alignment: .bottom, spacing: 1) {
             tabButton(title: "현재", tab: .current)
@@ -68,7 +64,6 @@ struct Index: View {
         }
         .padding(.top, 16)
         .padding(.horizontal, 28)
-        
     }
     
     private func tabButton(title: String, tab: Tab) -> some View {
@@ -94,11 +89,11 @@ struct Index: View {
     private var content: some View {
         switch selectedTab {
         case .current:
-            CurrentView(viewModel: viewModel)
+            CurrentView()      // ✅ 각 View가 자기 ViewModel을 가짐
         case .future:
-            FutureView(viewModel: viewModel)
+            FutureView()
         case .sleep:
-            SleepView(viewModel: viewModel)
+            SleepView()
         }
     }
     
@@ -148,4 +143,3 @@ extension View {
 #Preview {
     Index()
 }
-

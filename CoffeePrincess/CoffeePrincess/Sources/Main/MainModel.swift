@@ -7,6 +7,7 @@
 
 import Foundation
 
+//큐랜드
 struct Drink: Identifiable {
     let id = UUID()
     let icon: String
@@ -15,6 +16,7 @@ struct Drink: Identifiable {
     let timeText: String
 }
 
+//슬립
 struct MetabolismBar: Identifiable {
     let id = UUID()
     let timeLabel: String

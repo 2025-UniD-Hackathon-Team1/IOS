@@ -10,12 +10,16 @@ import SwiftUI
 
 struct FutureView: View {
     
-    @StateObject private var viewModel: MainViewModel
+    @StateObject private var viewModel: FutureViewModel
+    @EnvironmentObject private var scheduleService: ScheduleService  // ← 핵심
     @Environment(\.diContainer) private var di
     
-    init(viewModel: MainViewModel = MainViewModel()) {
+    
+    init(viewModel: FutureViewModel = FutureViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+
     
     var body: some View {
         VStack {
@@ -88,10 +92,10 @@ extension FutureView {
         }
     
     private var todayScheduleSection: some View {
-        
-        let schedules = di.scheduleService.todaySchedules
-        
-        return VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
+            
+            let schedules = scheduleService.todaySchedules
+            
             HStack {
                 Text("오늘의 일정")
                     .font(.headline)
@@ -133,7 +137,7 @@ extension FutureView {
                 VStack(spacing: 10) {
                     ForEach(schedules) { schedule in
                         HStack(alignment: .top, spacing: 10) {
-                            // 왼쪽 타임라인 동그라미
+                            
                             VStack {
                                 Circle()
                                     .fill(Color.mainBrown)
@@ -148,7 +152,8 @@ extension FutureView {
                                 Text(schedule.time)
                                     .font(.caption)
                                     .foregroundColor(.secondaryBrown)
-                                Text(schedule.title)
+                                
+                                Text(schedule.name)    // ← FIXED
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.fontBrown)
@@ -168,6 +173,7 @@ extension FutureView {
                 .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
         )
     }
+
 }
 
 #Preview {

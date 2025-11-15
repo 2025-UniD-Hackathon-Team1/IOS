@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SurveyView: View {
     
-    @ObservedObject var viewModel: SurveyViewModel
+    @StateObject private var viewModel = SurveyViewModel()
     @Environment(\.diContainer) private var di
     
     var body: some View {
@@ -274,5 +274,5 @@ struct CheckboxOption: View {
 
 // MARK: - Preview
 #Preview {
-    SurveyView(viewModel: SurveyViewModel())
+    SurveyView()
 }

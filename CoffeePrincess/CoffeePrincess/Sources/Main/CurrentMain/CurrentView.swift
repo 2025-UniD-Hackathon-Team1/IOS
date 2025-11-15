@@ -9,10 +9,10 @@ import SwiftUI
 
 struct CurrentView: View {
     
-    @StateObject private var viewModel: MainViewModel
+    @StateObject private var viewModel: CurrentViewModel
     @Environment(\.diContainer) private var di
     
-    init(viewModel: MainViewModel = MainViewModel()) {
+    init(viewModel: CurrentViewModel = CurrentViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
