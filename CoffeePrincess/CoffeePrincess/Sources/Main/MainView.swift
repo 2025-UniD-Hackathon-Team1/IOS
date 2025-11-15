@@ -54,6 +54,7 @@ struct MainView: View {
                     .padding(.bottom, 24)
                 }
             }
+            .background(Color(.cardBackground))
             .navigationBarHidden(true)
         }
     }
@@ -70,9 +71,10 @@ extension MainView {
                 Text("오늘의 카페인")
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundColor(.fontBrown)
                 Text(viewModel.todayString)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.secondaryBrown)
             }
             
             Spacer()
@@ -82,8 +84,9 @@ extension MainView {
             } label: {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.mainBrown)
                     .padding(10)
-                    .background(Color(.systemGray6))
+                    .background(Color(.white))
                     .clipShape(Circle())
             }
             
@@ -92,7 +95,7 @@ extension MainView {
             } label: {
                 Image(systemName: "person.crop.circle")
                     .font(.system(size: 28))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(.mainBrown)
             }
             .padding(.leading, 4)
         }
@@ -103,30 +106,38 @@ extension MainView {
         VStack(alignment: .center, spacing: 16) {
 
             // 상태 텍스트들
-            HStack(alignment: .center, spacing: 35) {
+            HStack(alignment: .center) {
                 
                 HStack(spacing: 6) {
                     Text(viewModel.statusIcon)
                         .font(.system(size: 28))
                     Text(viewModel.statusText)
-                        .font(.headline)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.fontBrown)
                 }
+                Spacer()
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("현재 카페인")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.secondaryBrown)
                     Text("\(Int(viewModel.currentCaffeine))mg")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.fontBrown)
                 }
+                
+                Spacer()
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("마지막 섭취")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.secondaryBrown)
                     Text(viewModel.lastIntakeText)
-                        .font(.subheadline)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.fontBrown)
                 }
                 
                 Spacer()
@@ -135,7 +146,7 @@ extension MainView {
             // 가로 카페인 게이지
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray6))
+                    .fill(Color(.sectionBackground))
 
                 GeometryReader { proxy in
                     let width = proxy.size.width * CGFloat(viewModel.caffeinePercent / 100.0)
@@ -144,8 +155,8 @@ extension MainView {
                         .fill(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.99, green: 0.42, blue: 0.42),
-                                    Color(red: 1.0, green: 0.78, blue: 0.40)
+                                    Color(.secondaryBrown),
+                                    Color(.dividerCol)
                                 ]),
                                 startPoint: .leading,
                                 endPoint: .trailing
@@ -157,8 +168,6 @@ extension MainView {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
             }
             .frame(width: 340, height: 28)
-            
-            Spacer()
         }
         .padding(16)
         .background(
@@ -406,14 +415,15 @@ extension MainView {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.mainBrown)
             Text(value)
                 .font(.subheadline)
                 .fontWeight(.semibold)
+                .foregroundColor(.fontBrown)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(Color(.systemGray6))
+        .background(Color(.dividerCol))
         .cornerRadius(12)
     }
 }
