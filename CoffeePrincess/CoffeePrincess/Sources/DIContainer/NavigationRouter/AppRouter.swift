@@ -13,7 +13,8 @@ enum Route: Hashable {
     case addRecord
     case recordDetail(menuItem: MenuItem)
     case scheduleInput
-    case profile
+    case newReport
+    case newReportProfile
 }
 
 final class AppRouter: ObservableObject {

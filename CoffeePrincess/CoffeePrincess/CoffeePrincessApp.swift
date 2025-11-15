@@ -25,7 +25,6 @@ struct CoffeePrincessApp: App {
         WindowGroup {
             NavigationStack(path: $router.path) {
                 Index(viewModel: MainViewModel())
-
                     .environment(\.diContainer, container)
                     .navigationDestination(for: Route.self) { route in
                         switch route {
@@ -43,8 +42,11 @@ struct CoffeePrincessApp: App {
                         case .recordDetail(let menuItem):
                             RecordDetailView(menuItem: menuItem)
                                 .navigationBarBackButtonHidden(true)
-                        case .profile:
-                            ProfileView()
+                        case .newReport:
+                            NewReportView()
+                                .navigationBarBackButtonHidden(true)
+                        case .newReportProfile:
+                            NewReportProfileView()
                                 .navigationBarBackButtonHidden(true)
                         }
                     }
