@@ -12,6 +12,7 @@ struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     @State private var selectedPeriod: CaffeinePeriod = .week
     @Environment(\.diContainer) private var di
+    @EnvironmentObject private var scheduleService: ScheduleService
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -30,6 +31,7 @@ struct MainView: View {
                         // ── NEW: 여기부터 새 섹션들 ──
                         caffeineMetabolismSection
                         scheduleRecommendationSection
+                        todayScheduleSection
                         tonightSleepPredictionSection
                         // ── NEW 끝 ──
                         
@@ -567,14 +569,6 @@ extension MainView {
         VStack(alignment: .leading, spacing: 10) {
             Text("오늘의 일정 기반 추천")
                 .font(.headline)
-                    
-            Button {
-                di.router.push(.scheduleInput)
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title3)
-            }
-            .buttonStyle(.plain)
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -679,5 +673,59 @@ struct CaffeineTrackerView_Previews: PreviewProvider {
             MainView()
                 .preferredColorScheme(.dark)
         }
+    }
+}
+
+extension MainView {
+    private var todayScheduleSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("오늘의 일정")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    di.router.push(.scheduleInput)
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+            }
+            
+            if scheduleService.todaySchedules.isEmpty {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+                    .frame(height: 60)
+                    .overlay(
+                        Text("등록된 일정이 없습니다")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    )
+            } else {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(scheduleService.todaySchedules) { schedule in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(schedule.title)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                Text(schedule.time)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                        }
+                        Divider()
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
+        )
     }
 }

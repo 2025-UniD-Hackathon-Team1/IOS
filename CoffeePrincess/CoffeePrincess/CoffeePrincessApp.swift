@@ -11,6 +11,7 @@ import SwiftUI
 struct CoffeePrincessApp: App {
     @StateObject private var router = AppRouter()
     @StateObject private var container: DIContainer
+    @StateObject private var scheduleService = ScheduleService()
     
     @Environment(\.scenePhase) private var scenePhase
     
@@ -37,6 +38,7 @@ struct CoffeePrincessApp: App {
                     }
             }
             //.environmentObject(container)
+            .environmentObject(scheduleService)
             .environment(\.diContainer, container)
             .alert(isPresented: $container.router.showAlert) {
                 Alert(
