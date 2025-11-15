@@ -30,30 +30,39 @@ struct RecordDetailView: View {
         VStack(spacing: 0) {
             List {
                 // MARK: - 메뉴 설정
-                Section(header: Text("섭취량 설정")) {
+                Section(header: headerView(title: "섭취량 설정")) {
                     Stepper(value: $viewModel.shotCount, in: 0...10) {
                         HStack {
-                            Image(systemName: "plus.circle")
+//                            Image(systemName: "plus.circle")
+                            Image(.plus)
                                 .foregroundStyle(Color.mainBrown)
+                                .padding(.trailing, 5)
                             Text("샷 추가")
+//                                .font(.pretendard(.regular, size: 17))
                             Spacer()
                             Text("\(viewModel.shotCount) 샷")
+                                .foregroundStyle(Color.mainBrown)
                         }
                     }
-                    .font(.pretendard(.medium, size: 17))
-                    
-                    Picker("사이즈", selection: $viewModel.size) {
-                        ForEach(CoffeeSize.allCases, id: \.self) { size in
-                            Text(size.rawValue).tag(size)
+                    .font(.pretendard(.regular, size: 17))
+                    HStack {
+                        Image(.size)
+                            .foregroundStyle(Color.mainBrown)
+                            .padding(.trailing, 5)
+                        Picker("사이즈", selection: $viewModel.size) {
+                            ForEach(CoffeeSize.allCases, id: \.self) { size in
+                                Text(size.rawValue).tag(size)
+                            }
                         }
                     }
-                    .font(.pretendard(.medium, size: 17))
+                    .font(.pretendard(.regular, size: 17))
                     .pickerStyle(.menu)
                     .tint(Color.mainBrown)
                 }
+                .listRowBackground(Color.cardBackground)
                 
                 // MARK: - 시간 설정
-                Section(header: Text("섭취 시간")) {
+                Section(header: headerView(title: "섭취 시간")) {
                     DatePicker(
                         "마신 시간",
                         selection: $viewModel.selectedDate,
@@ -62,24 +71,27 @@ struct RecordDetailView: View {
                     )
                     .datePickerStyle(.graphical) // 달력 스타일
                     .labelsHidden()
-                    .tint(Color.mainBrown)
+                    .tint(Color.secondaryBrown)
                 }
+                .listRowBackground(Color.cardBackground)
                 
                 // MARK: - 총 카페인 (계산 결과)
-                Section(header: Text("예상 카페인")) {
+                Section(/*header: headerView(title: "예상 카페인")*/) {
                     HStack {
                         Image("activity-heart")
                             .foregroundStyle(Color.mainBrown)
-                        Text("총 카페인 함량")
+                        Text("예상 총 카페인 함량")
                             .font(.pretendard(.regular, size: 17))
                         Spacer()
                         Text("\(viewModel.totalCaffeine) mg")
                             .font(.pretendard(.bold, size: 19))
-                            .foregroundColor(.mainBrown)
+                            .foregroundColor(.secondaryBrown)
                     }
                 }
+                .listRowBackground(Color.cardBackground)
             }
-            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+//            .listStyle(.insetGrouped)
             
             // MARK: - 저장 버튼
             Button(action: {
@@ -89,15 +101,25 @@ struct RecordDetailView: View {
                     .font(.pretendard(.bold, size: 18))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.mainBrown)
+                    .background(Color.secondaryBrown)
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 10)
+//            .padding(.bottom, 10)
         }
 //        .navigationTitle(viewModel.selectedMenuItem.name) // 네비게이션 타이틀에 메뉴 이름
 //        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    @ViewBuilder
+    private func headerView(title: String) -> some View {
+        Text(title)
+            .font(.pretendard(.regular, size: 18)) // "평소 수면 패턴" 폰트와 비슷하게
+            .foregroundStyle(Color.mainBrown) // 메인 브라운보다 연한 색
+//            .padding(.leading, 8) // List의 기본 패딩과 맞춤
+//            .padding(.bottom, 8) // 섹션과 간격
+            .textCase(nil) // 대문자 변환 비활성화
     }
 }
 

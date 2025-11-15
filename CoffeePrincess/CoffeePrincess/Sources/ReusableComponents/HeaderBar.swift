@@ -16,7 +16,7 @@ struct HeaderBar: View {
             HStack {
                 Button(action: { onTapBack() }) {
                     Image(systemName: "chevron.left")
-                        .foregroundStyle(.mainBrown)
+                        .foregroundStyle(.black)
                         .padding(.leading)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -27,7 +27,7 @@ struct HeaderBar: View {
             // 인덱스 중앙
             Text(viewText)
                 .font(.pretendard(.regular, size: 18))
-                .foregroundStyle(.mainBrown)
+//                .foregroundStyle(.mainBrown)
         }
     }
 }

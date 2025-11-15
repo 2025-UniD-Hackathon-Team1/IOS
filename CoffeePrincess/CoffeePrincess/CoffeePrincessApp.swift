@@ -25,20 +25,26 @@ struct CoffeePrincessApp: App {
         WindowGroup {
             NavigationStack(path: $router.path) {
                 Index(viewModel: MainViewModel())
+
                     .environment(\.diContainer, container)
                     .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .home:
                             MainView()
                                 .environment(\.diContainer, container)
+                                .navigationBarBackButtonHidden(true)
                         case .scheduleInput:
                             ScheduleView()
                                 .environment(\.diContainer, container)
+                                .navigationBarBackButtonHidden(true)
                         case .addRecord:
                             AddRecordView()
                                 .navigationBarBackButtonHidden(true)
                         case .recordDetail(let menuItem):
                             RecordDetailView(menuItem: menuItem)
+                                .navigationBarBackButtonHidden(true)
+                        case .profile:
+                            ProfileView()
                                 .navigationBarBackButtonHidden(true)
                         }
                     }

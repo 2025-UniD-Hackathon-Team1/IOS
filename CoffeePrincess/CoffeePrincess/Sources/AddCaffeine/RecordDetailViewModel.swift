@@ -9,23 +9,21 @@ import Foundation
 import Combine
 import SwiftUI
 
-/// RecordDetailView의 상태와 로직을 관리하는 ViewModel
+/// RecordDetailView의 상태와 로직을 관리하는 ViewModel (새 로직 적용)
 class RecordDetailViewModel: ObservableObject {
     
     // MARK: - Properties
     
     let selectedMenuItem: MenuItem
-    let baseCaffeinePerShot: Int
     
     // MARK: - Published State
     
-    // 1. View에서 바인딩할 상태
-    @Published var shotCount: Int = 1
+    @Published var shotCount: Int = 0 // "추가 샷"을 의미하며 0에서 시작
     @Published var size: CoffeeSize = .tall
     @Published var selectedDate: Date = Date()
+    @Published var totalCaffeine: Int = 0 // 계산된 총 카페인
     
-    // 2. 계산된 총 카페인
-    @Published var totalCaffeine: Int = 0
+    // MARK: - Private Properties
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -33,43 +31,40 @@ class RecordDetailViewModel: ObservableObject {
     
     init(menuItem: MenuItem) {
         self.selectedMenuItem = menuItem
-        self.baseCaffeinePerShot = menuItem.baseCaffeinePerShot
         
-        // 초기값 설정
+        // 1. 초기값 설정 (Tall, 추가 샷 0)
         self.size = .tall
-        self.shotCount = self.size.defaultShotCount
+        self.shotCount = 0
         
-        // 3. (핵심) shotCount 또는 size가 변경될 때마다 totalCaffeine을 다시 계산
+        // 2. 바인딩 설정
         setupBindings()
-        
-        // 4. 초기 카페인 값 계산
-        updateTotalCaffeine()
     }
     
     // MARK: - Private Methods
     
     private func setupBindings() {
-        // 샷 카운트가 변경되면 카페인 업데이트
-        $shotCount
-            .sink { [weak self] _ in
-                self?.updateTotalCaffeine()
-            }
-            .store(in: &cancellables)
-        
-        // 사이즈가 변경되면 샷 카운트를 기본값으로 업데이트
-        $size
-            .sink { [weak self] newSize in
-                self?.shotCount = newSize.defaultShotCount
-                // shotCount가 변경되었으므로 updateTotalCaffeine()이 자동으로 호출됨
+        // 1. (핵심) 'shotCount' 또는 'size'가 변경될 때마다,
+        Publishers.CombineLatest($shotCount, $size)
+            .sink { [weak self] (shots, size) in
+                // 2. 총 카페인을 다시 계산합니다.
+                self?.updateTotalCaffeine(extraShots: shots, selectedSize: size)
             }
             .store(in: &cancellables)
     }
     
-    /// 총 카페인을 계산하는 로직
-    private func updateTotalCaffeine() {
-        // (샷 당 카페인) * (샷 수)
-        totalCaffeine = baseCaffeinePerShot * shotCount
-        print("총 카페인 계산됨: \(totalCaffeine)mg")
+    /// 총 카페인을 계산하는 로직 (새 로직 적용)
+    private func updateTotalCaffeine(extraShots: Int, selectedSize: CoffeeSize) {
+        
+        // 1. (메뉴, 사이즈)에 맞는 '기본' 카페인 조회
+        let baseCaffeine = CaffeineData.getBaseCaffeine(for: selectedMenuItem, size: selectedSize)
+        
+        // 2. '추가' 샷 카페인 계산
+        let extraCaffeine = extraShots * CaffeineData.caffeinePerShot
+        
+        // 3. 총 합계
+        self.totalCaffeine = baseCaffeine + extraCaffeine
+        
+        print("(\(selectedSize.rawValue), 샷추가: \(extraShots)) 총 카페인 계산됨: \(totalCaffeine)mg")
     }
     
     // MARK: - Public Methods
@@ -78,7 +73,7 @@ class RecordDetailViewModel: ObservableObject {
     func saveRecord(container: DIContainer) {
         print("--- 카페인 기록 저장 ---")
         print("메뉴: \(selectedMenuItem.name)")
-        print("샷: \(shotCount), 사이즈: \(size.rawValue)")
+        print("추가 샷: \(shotCount), 사이즈: \(size.rawValue)")
         print("시간: \(selectedDate)")
         print("총 카페인: \(totalCaffeine)mg")
         
