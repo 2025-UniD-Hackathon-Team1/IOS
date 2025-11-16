@@ -21,7 +21,6 @@ struct HeaderSection: View {
     
     
     var body: some View{
-        VStack{
             
             //상단 헤더
             HStack(alignment: .center) {
@@ -42,23 +41,27 @@ struct HeaderSection: View {
                 
                 Spacer()
                 
-                HStack(spacing: 10) {
                     
                     Button {
                         di.router.push(.newReport)
                     } label: {
-                        Image(.fileicon)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 30)
-                            .foregroundColor(.secondaryBrown)
+                        ZStack {
+                            Circle()
+                                .stroke(Color.secondaryBrown, lineWidth: 2) // 테두리 색과 두께 설정
+                                .frame(width: 50, height: 50) // 원의 크기
+
+                            Image(.fileicon)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24) // 아이콘 크기
+                                .foregroundColor(.secondaryBrown)
+                        }
                     }
-                }
+                    .buttonStyle(PlainButtonStyle()) // 버튼의 기본 스타일 제거 (원형 유지)
             }
-            
         }
     }
-}
+
 
 #Preview {
     HeaderSection()
