@@ -73,10 +73,44 @@ extension FutureView {
             } receiveValue: { schedules in
                 // 이 화면에서만 쓰는 todaySchedules에 바로 꽂기
                 self.todaySchedules = schedules
+                
+                // ✅ 첫 번째 스케줄을 기반으로 ViewModel 값 세팅
+                if let first = schedules.first {
+                    self.updateViewModel(with: first)
+                }
             }
             .store(in: &cancellables)
     }
+
 }
+extension FutureView {
+    
+    /// 첫 번째 일정으로 추천 영역 텍스트 세팅
+    private func updateViewModel(with schedule: Schedule) {
+        // e.g. schedule.time == "13시", schedule.name == "회의"
+        viewModel.scheduleTimeText = schedule.time
+        viewModel.scheduleTitle = schedule.name
+        viewModel.recommendIntakeTimeText = recommendTime(from: schedule.time)
+    }
+    
+   
+    /// "07:32" → "06:32" 로 1시간 전 추천 시간 계산
+    private func recommendTime(from scheduleTime: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        
+        guard let date = formatter.date(from: scheduleTime) else {
+            return scheduleTime // 파싱 실패 시 그대로 반환
+        }
+        
+        // -1시간
+        let recommendDate = Calendar.current.date(byAdding: .hour, value: -1, to: date) ?? date
+        
+        return formatter.string(from: recommendDate)
+    }
+
+}
+
 
 extension FutureView {
     private var scheduleRecommendationSection: some View {
@@ -85,40 +119,56 @@ extension FutureView {
                 .font(.headline)
                 .foregroundColor(.fontBrown)
             
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .center, spacing: 8) {
-                    Image(systemName: "clock.badge.exclamationmark")
-                        .font(.subheadline)
-                        .foregroundColor(.mainBrown)
+            if todaySchedules.isEmpty {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.cardBackground))
+                    .frame(height: 60)
+                    .overlay(
+                        HStack(spacing: 6) {
+                            Image(systemName: "calendar.badge.plus")
+                                .foregroundColor(.secondary)
+                            Text("등록된 일정이 없습니다")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    )
+            } else {
+                // 원래 추천 UI
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Image(systemName: "clock.badge.exclamationmark")
+                            .font(.subheadline)
+                            .foregroundColor(.mainBrown)
+                        
+                        Text(viewModel.scheduleTimeText)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        
+                        Text("· \(viewModel.scheduleTitle)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondaryBrown)
+                        
+                        Spacer()
+                    }
                     
-                    Text(viewModel.scheduleTimeText)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    
-                    Text("· \(viewModel.scheduleTitle)")
-                        .font(.subheadline)
+                    Text("최상의 각성 상태를 위해, 아래 시간에 한 잔 어떠세요?")
+                        .font(.footnote)
                         .foregroundColor(.secondaryBrown)
                     
-                    Spacer()
+                    HStack(spacing: 6) {
+                        Image(systemName: "cup.and.saucer.fill")
+                            .font(.caption)
+                        Text("\(viewModel.recommendIntakeTimeText)에 커피를 드시는 것을 추천합니다.")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
                 }
-                
-                Text("최상의 각성 상태를 위해, 아래 시간에 한 잔 어떠세요?")
-                    .font(.footnote)
-                    .foregroundColor(.secondaryBrown)
-                
-                HStack(spacing: 6) {
-                    Image(systemName: "cup.and.saucer.fill")
-                        .font(.caption)
-                    Text("\(viewModel.recommendIntakeTimeText)에 커피를 드시는 것을 추천합니다.")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color(.cardBackground))
+                )
             }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color(.cardBackground))
-            )
         }
         .padding(16)
         .background(
@@ -127,6 +177,7 @@ extension FutureView {
                 .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
         )
     }
+
     
     private var todayScheduleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
