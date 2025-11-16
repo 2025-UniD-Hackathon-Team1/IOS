@@ -17,6 +17,7 @@ final class DIContainer: ObservableObject {
     // MARK: - Services
     let scheduleService: ScheduleService
     let coffeeService: CoffeeService
+    let dashboardService: DashboardService
     
     // MARK: - Published Properties
     @Published var selectedTab: String = "홈"
@@ -28,6 +29,7 @@ final class DIContainer: ObservableObject {
         self.router = router
         self.scheduleService = scheduleService
         self.coffeeService = CoffeeService()
+        self.dashboardService = DashboardService()
     }
 }
 

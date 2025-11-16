@@ -33,6 +33,7 @@ struct CurrentView: View {
             .task {
                 // ★★★ 뷰가 나타날 때 API 호출 ★★★
                 viewModel.fetchTodayCoffee(container: di)
+                viewModel.fetchDashboardStatus(container: di)
             }
     }
 }
@@ -87,41 +88,50 @@ extension CurrentView {
                 }
                 
                 // 가로 카페인 게이지
-                VStack(alignment: .leading, spacing: 6) {
+                if viewModel.isLoadingStatus {
                     HStack {
-                        Text("각성도")
-                            .font(.caption)
-                            .foregroundColor(.secondaryBrown)
                         Spacer()
-                        Text("\(Int(viewModel.currentAlertnessPercent))%")
-                            .font(.caption)
-                            .foregroundColor(.secondaryBrown)
-                    }
-                    
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.sectionBackground))
-                        
-                        GeometryReader { proxy in
-                            let width = proxy.size.width * CGFloat(viewModel.currentAlertnessPercent / 100.0)
-                            
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color(.secondaryBrown),
-                                            Color(.dividerCol)
-                                        ]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: max(0, width))
-                                .padding(4)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        ProgressView()
+                        Spacer()
                     }
                     .frame(height: 26)
+                } else {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("각성도")
+                                .font(.caption)
+                                .foregroundColor(.secondaryBrown)
+                            Spacer()
+                            Text("\(Int(viewModel.currentAlertnessPercent))%")
+                                .font(.caption)
+                                .foregroundColor(.secondaryBrown)
+                        }
+                        
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(.sectionBackground))
+                            
+                            GeometryReader { proxy in
+                                let width = proxy.size.width * CGFloat(viewModel.currentAlertnessPercent / 100.0)
+                                
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(.secondaryBrown),
+                                                Color(.dividerCol)
+                                            ]),
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(width: max(0, width))
+                                    .padding(4)
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .frame(height: 26)
+                    }
                 }
             }
             .padding(16)
@@ -138,7 +148,7 @@ extension CurrentView {
     private var currentStateSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("현재 상태")
+                Text("각성 종료 예상 시각")
                     .font(.headline)
                     .foregroundColor(.fontBrown)
                 Spacer()
@@ -146,8 +156,14 @@ extension CurrentView {
             
             HStack(spacing: 12) {
 //                statBox(title: "카페인 농도", value: "\(Int(viewModel.caffeinePercent))%")
-                statBox(title: "에너지 레벨", value: "\(Int(viewModel.energyPercent))%")
-                statBox(title: "각성 종료", value: viewModel.awakeEndText)
+//                statBox(title: "에너지 레벨", value: "\(Int(viewModel.energyPercent))%")
+//                statBox(title: "각성 종료", value: viewModel.awakeEndText)
+                Image(.clock)
+                    .foregroundStyle(.mainBrown)
+                Text("\(viewModel.awakeEndText)")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.fontBrown)
             }
         }
         .padding(16)

@@ -14,12 +14,16 @@ struct FutureView: View {
     @StateObject private var viewModel: FutureViewModel
     @Environment(\.diContainer) private var di
     
-    // 🔥 이 화면에서 바로 GET해서 쓸 상태
-      @State private var todaySchedules: [Schedule] = []
-      @State private var cancellables = Set<AnyCancellable>()
-      
-      // 이 View 안에서만 쓰는 서비스 인스턴스
-      private let scheduleService = ScheduleService()
+    @State private var todaySchedules: [Schedule] = []
+    @State private var cancellables = Set<AnyCancellable>()
+    
+    @State private var isLoadingSchedules: Bool = false
+    
+    // (수정) DIContainer에서 ScheduleService를 가져옵니다.
+    // private let scheduleService = ScheduleService() // <- 이 방식 대신
+    private var scheduleService: ScheduleService {
+        di.scheduleService // <- DIContainer에서 가져옵니다.
+    }
     
     init(viewModel: FutureViewModel = FutureViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -45,7 +49,9 @@ struct FutureView: View {
             }
         .background(Color(.cardBackground))
         .onAppear {
-                fetchTodaySchedules()   // ⬅️ 여기서 GET 한 번
+            // ★★★ (수정) 두 개의 API를 모두 호출 ★★★
+            fetchTodaySchedules() // 1. 기존 일정 API (View에서)
+//            viewModel.fetchCaffeineGraph(container: di) // 2. 새 그래프 API (ViewModel에서)
         }
     }
 }
@@ -72,56 +78,55 @@ extension FutureView {
     }
 }
 
-
 extension FutureView {
     private var scheduleRecommendationSection: some View {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("오늘의 일정 기반 추천")
-                    .font(.headline)
-                    .foregroundColor(.fontBrown)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .center, spacing: 8) {
-                        Image(systemName: "clock.badge.exclamationmark")
-                            .font(.subheadline)
-                            .foregroundColor(.mainBrown)
-                        
-                        Text(viewModel.scheduleTimeText)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        
-                        Text("· \(viewModel.scheduleTitle)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondaryBrown)
-                        
-                        Spacer()
-                    }
+        VStack(alignment: .leading, spacing: 10) {
+            Text("오늘의 일정 기반 추천")
+                .font(.headline)
+                .foregroundColor(.fontBrown)
+            
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .center, spacing: 8) {
+                    Image(systemName: "clock.badge.exclamationmark")
+                        .font(.subheadline)
+                        .foregroundColor(.mainBrown)
                     
-                    Text("최상의 각성 상태를 위해, 아래 시간에 한 잔 어떠세요?")
-                        .font(.footnote)
+                    Text(viewModel.scheduleTimeText)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    Text("· \(viewModel.scheduleTitle)")
+                        .font(.subheadline)
                         .foregroundColor(.secondaryBrown)
                     
-                    HStack(spacing: 6) {
-                        Image(systemName: "cup.and.saucer.fill")
-                            .font(.caption)
-                        Text("\(viewModel.recommendIntakeTimeText)에 커피를 드시는 것을 추천합니다.")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                    }
+                    Spacer()
                 }
-                .padding(14)
-                .background(
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(Color(.cardBackground))
-                )
+                
+                Text("최상의 각성 상태를 위해, 아래 시간에 한 잔 어떠세요?")
+                    .font(.footnote)
+                    .foregroundColor(.secondaryBrown)
+                
+                HStack(spacing: 6) {
+                    Image(systemName: "cup.and.saucer.fill")
+                        .font(.caption)
+                    Text("\(viewModel.recommendIntakeTimeText)에 커피를 드시는 것을 추천합니다.")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
             }
-            .padding(16)
+            .padding(14)
             .background(
-                RoundedRectangle(cornerRadius: 22)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color(.cardBackground))
             )
         }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 22)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 4)
+        )
+    }
     
     private var todayScheduleSection: some View {
         VStack(alignment: .leading, spacing: 12) {

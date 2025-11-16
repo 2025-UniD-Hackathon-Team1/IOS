@@ -24,6 +24,8 @@ final class CurrentViewModel: ObservableObject {
     
     @Published var isLoadingTodayDrinks: Bool = false
     
+    @Published var isLoadingStatus: Bool = false
+    
     // ★★★ 날짜 포맷을 위한 헬퍼 추가 ★★★
     private var dateFomatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -31,14 +33,6 @@ final class CurrentViewModel: ObservableObject {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
-    
-//    // 오늘 날짜 텍스트 (필요하면 헤더에서 사용할 수 있음)
-//    var todayString: String {
-//        let formatter = DateFormatter()
-//        formatter.locale = Locale(identifier: "ko_KR")
-//        formatter.dateFormat = "yyyy.MM.dd (E)"
-//        return formatter.string(from: Date())
-//    }
     
     // MARK: - Init
     init() {
@@ -88,15 +82,77 @@ final class CurrentViewModel: ObservableObject {
         }
     }
     
+    /// (GET) ★★★ 대시보드 상태 (카페인, 각성도)를 불러옵니다 ★★★
+    func fetchDashboardStatus(container: DIContainer) {
+        isLoadingStatus = true
+        
+        let group = DispatchGroup()
+        
+        // --- 1. 카페인 정보 가져오기 ---
+        group.enter()
+        container.dashboardService.getCaffeineInfo { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] 카페인 정보 로드 성공")
+                    self?.currentCaffeine = response.currentCaffeine
+                    // (참고: graph 데이터는 response.graph에 있습니다)
+                case .failure(let error):
+                    print("❌ [GET] 카페인 정보 로드 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+        
+        // --- 2. 각성 정보 가져오기 ---
+        group.enter()
+        container.dashboardService.getAlertnessInfo { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ [GET] 각성도 정보 로드 성공")
+                    // 서버가 0.23 (비율)로 주므로 100을 곱해 %로 변환
+                    self?.currentAlertnessPercent = response.currentAlertness * 100
+                    // 시간 포맷 변경
+                    self?.awakeEndText = self?.formatAwakeEndTime(response.alertnessEndTime) ?? "정보 없음"
+                case .failure(let error):
+                    print("❌ [GET] 각성도 정보 로드 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+        
+        // --- 3. 두 API가 모두 완료되면 로딩 종료 ---
+        group.notify(queue: .main) {
+            self.isLoadingStatus = false
+            print("--- 🏁 대시보드 상태 업데이트 완료 ---")
+        }
+    }
+    
+    /// "YYYY-MM-DD HH:mm:ss" ➔ "오후 11:10"
+    private func formatAwakeEndTime(_ dateString: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        guard let date = formatter.date(from: dateString) else {
+            return dateString // 변환 실패 시 원본 반환
+        }
+        
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "a h:mm" // "오후 11:10"
+        return formatter.string(from: date)
+    }
+    
     // MARK: - Mock Data
     private func loadMockData() {
-        currentCaffeine      = 185.0
-        currentAlertnessPercent      = 46.0
+//        currentCaffeine      = 185.0
+//        currentAlertnessPercent      = 46.0
         energyPercent        = 78.0
         statusIcon           = "😌"
         statusText           = "보통"
         lastIntakeText       = "1시간 20분 전"
-        awakeEndText         = "오후 11:10"
+//        awakeEndText         = "오후 11:10"
         
         todayDrinks = [
             Drink(icon: "☕️", name: "아메리카노", amountMg: 95, timeText: "오전 9:10"),
